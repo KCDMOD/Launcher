@@ -1,0 +1,218 @@
+@import url("https://rsms.me/inter/inter.css");
+@-webkit-keyframes spin-infinite {
+  0% {
+    stroke-dasharray: 0.01px 43.97px;
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(450deg);
+    stroke-dasharray: 21.99px 21.99px;
+  }
+  100% {
+    stroke-dasharray: 0.01px 43.97px;
+    transform: rotate(1080deg);
+  }
+}
+
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+  -webkit-user-drag: none;
+  -webkit-user-select: none;
+}
+
+* {
+  font-family: "Inter", sans-serif;
+}
+:root {
+  --bg-color: #090b0f;
+  --text-color: #f1f1f1;
+  --link-bg: #00080e;
+  --link-hover-bg: #061b21;
+  --btn-border: transparent;
+}
+
+.app {
+    background: #090b0f;
+}
+
+.versionf {
+    color: #aaaaaa;
+    font-size: 12px;
+    padding: 10px;
+    background: rgba(0,0,0,0.8);
+    border-radius: 10px;
+}
+
+.versionf span {
+    color: #fff;
+    background: rgba(0,0,0,0.3);
+    text-transform: uppercase;
+    padding: 3px;
+    font-size: 10px;
+    border-radius: 3px;
+}
+
+.versionf i{
+    color: #aaaaaa;
+}
+
+.kcd_intro {
+font-size: 16px;
+font-weight: 500;
+color: #fff;
+}
+
+.discord-bb{
+    color: #cacaca;
+    transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.discord-bb:hover {
+    color: #fff;
+    filter: brightness(1.2);
+    transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.updatekcd {
+    background: url('buttons/update.png') no-repeat;
+    width: 93px;
+    height: 34px;
+    border: none;
+    transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+.updatekcd:hover {
+    filter: brightness(1.2);
+}
+
+.runkcd {
+    background: url('buttons/start.png') no-repeat;
+    width: 89px;
+    height: 34px;
+    border: none;
+    transition: filter 0.3s ease, transform 0.3s ease;
+}
+.runkcd:hover {
+    filter: brightness(1.2);
+}
+
+.stepinstaller {
+    font-size: 16px;
+    color: #fff;
+    font-weight: 600;
+
+}
+
+.kcdmodv {
+    line-height: 5px;
+    color: #3ee177;
+}
+
+.spinner-border {
+    --bs-spinner-width: 2rem;
+    --bs-spinner-height: 2rem;
+    --bs-spinner-vertical-align: -0.125em;
+    --bs-spinner-border-width: 0.25em;
+    --bs-spinner-animation-speed: 0.75s;
+    --bs-spinner-animation-name: spinner-border;
+    border: var(--bs-spinner-border-width) solid #ffca65;
+    border-right-color: transparent;
+}
+
+.stepinstaller span {
+font-weight: 400;
+font-size: 13px;
+
+}
+
+::-webkit-scrollbar {
+  display: none;
+}
+
+html {
+
+  overflow: hidden; /* Obcina zawartość wychodzącą poza granice */
+}
+
+.card.app {
+  width: 100%;
+  height: 100%;
+}
+
+
+.custom-titlebar {
+  position: fixed;
+  top: 0; /* lub bottom: 0; jeśli chcesz mieć pasek u dołu */
+  left: 0;
+  width: 100%;
+  height: 30px;
+  background: transparent;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  -webkit-app-region: drag; /* umożliwia przeciąganie okna */
+  z-index: 1000;
+}
+
+.custom-titlebar button {
+  background: transparent;
+  border: none;
+  color: white;
+  margin-right: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  -webkit-app-region: no-drag; /* przyciski nie będą przeciągane */
+}
+
+.custom-titlebar .title {
+  flex-grow: 1;
+  text-align: left;
+  padding-left: 10px;
+  font-size: 12px; 
+  text-transform: uppercase;
+  opacity: 0.4;
+}
+
+
+
+body {
+  background: var(--bg-color);
+  background-repeat: repeat;
+  background-position: center;
+  color: var(--text-color);
+  font-family: "Inter", sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  margin: 0;
+}
+body::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-repeat: repeat;
+  opacity: 0.1; /* Możesz dostosować wartość */
+  pointer-events: none; /* Zapobiega klikaniu na pseudo-element */
+}
+
+.kcd_socials {
+    padding: 5px;
+    line-height: 16px;
+    font-size: 16px;
+}
+
+@keyframes anime {
+   0% {
+     background-position: 0% 50%}
+   50% {
+     background-position: 100% 50% }
+   100% {
+     background-position: 0% 50% }
+    }     

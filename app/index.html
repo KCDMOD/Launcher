@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KCDMOD Installer</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://atugatran.github.io/FontAwesome6Pro/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="app.css">
+</head>
+<div class="custom-titlebar">
+    <span class="title">KCDMOD LAUNCHER</span>
+    <div>
+        <button id="minimizeBtn"><i class="fa-sharp fa-solid fa-arrow-down-left"></i></button>
+        <button id="closeBtn"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+</div>
+<body>
+    <div class="card app">
+        <div class="card-body text-center">
+            <p class="kcd_intro"><img src="kcd.svg" height="15px"></p>
+            <p class="versionf">
+                <i class="fa-duotone fa-solid fa-code-compare"></i> Version: <span id="version"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa-brands fa-github-alt"></i> Release: <span id="release"></span>
+            </p>
+            <br>
+            <center>
+                <section id="notinstalled">
+                    <p class="display-6 stepinstaller">Welcome to KCDMOD <i class="fa-duotone fa-octagon-check kcdmodv"></i><br><span>Click button below to begin installation setup.</span></p>
+                    <button type="button" id="update" class="updatekcd"></button>
+                    <br>
+                </section>
+
+                <section id="installing" style="display: none">
+                    <p class="display-6 stepinstaller">Please wait..</p>
+                    <div class="spinner-border" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </section>
+
+                <section id="installed" style="display: none">
+                    <p class="display-6 stepinstaller">You are up to date!<br><span>You can start KCDMOD from button below.</span></p>
+                    <button type="button" id="run" class="runkcd"></button>
+                </section>
+                <br>
+                <div class="kcd_socials">
+                    <a href="https://discord.gg/8Y4BZCKj7h"><i class="fa-brands fa-discord discord-bb"></i></a>
+                </div>
+            
+            <!-- Toast Container -->
+            <div id="toastContainer" class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3"></div>
+        </center>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script src="app.js"></script>
+</body>
+</html>
