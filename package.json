@@ -11,12 +11,13 @@
   "license": "ISC",
   "description": "Launcher for KCDMOD",
   "dependencies": {
-    "axios": "^1.8.2",
+    "axios": "^1.8.3",
     "create-desktop-shortcuts": "^1.11.0",
+    "dotenv": "^16.4.7",
     "extract-zip": "^2.0.1"
   },
   "devDependencies": {
-    "electron": "^35.0.0",
+    "electron": "^35.0.1",
     "electron-builder": "^25.1.8",
     "patch-package": "^8.0.0"
   },
@@ -24,6 +25,9 @@
     "asar": true,
     "asarUnpack": [
       "node_modules/create-desktop-shortcuts/src/windows.vbs"
+    ],
+    "extraFiles": [
+    ".env"
     ],
     "removePackageScripts": true,
     "files": [

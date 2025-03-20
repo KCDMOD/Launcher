@@ -12,19 +12,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="app.css">
+    <link rel="stylesheet" href="app/app.css">
 </head>
-<div class="custom-titlebar">
-    <span class="title">KCDMOD LAUNCHER</span>
-    <div>
-        <button id="minimizeBtn"><i class="fa-sharp fa-solid fa-arrow-down-left"></i></button>
-        <button id="closeBtn"><i class="fa-solid fa-xmark"></i></button>
-    </div>
-</div>
 <body>
     <div class="card app">
         <div class="card-body text-center">
-            <p class="kcd_intro"><img src="kcd.svg" height="15px"></p>
+            <p class="kcd_intro"><img src="app/kcd.svg" height="15px"></p>
             <p class="versionf">
                 <i class="fa-duotone fa-solid fa-code-compare"></i> Version: <span id="version"></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="fa-brands fa-github-alt"></i> Release: <span id="release"></span>
             </p>
@@ -49,20 +42,14 @@
                 </section>
                 <br>
                 <div class="kcd_socials">
-                    <a href="https://discord.gg/8Y4BZCKj7h" target="_blank">
-                        <i class="fa-brands fa-discord discord-bb"></i>
-                    </a>
+                    <a href=""><i class="fa-brands fa-discord discord-bb"></i></a>
                 </div>
-                
-            
-            <!-- Toast Container -->
-            <div id="toastContainer" class="toast-container position-fixed bottom-0 start-50 translate-middle-x p-3"></div>
-        </center>
+            </center>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom JS -->
-    <script src="app.js"></script>
+    <script src="app/app.js"></script>
 </body>
 </html>

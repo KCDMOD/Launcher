@@ -1,9 +1,12 @@
-const { app, BrowserWindow, ipcMain, shell } = require('electron');
+// main.js
+require('dotenv').config(); // Ładowanie zmiennych z .env
+
+const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
 const axios = require('axios');
-const extract = require('extract-zip');
 const fs = require('fs');
 const os = require('os');
+const extract = require('extract-zip');
 const { execFile } = require('child_process');
 const createDesktopShortcut = require('create-desktop-shortcuts');
 
@@ -13,27 +16,26 @@ function createWindow() {
   mainWindow = new BrowserWindow({
     width: 420,
     height: 514,
-    frame: false,         // usuwa natywny pasek tytułu i ramkę
-    resizable: false,  
-    hasShadow: true, 
-    icon: path.join(__dirname, 'KCDMOD.ico'), // Ikona aplikacji
+    frame: false, // usuwa natywny pasek tytułu i ramkę
+    resizable: false,
+    icon: path.join(__dirname, 'KCDMOD.ico'), // ikona aplikacji
     webPreferences: {
-      // Dla produkcji rozważ użycie preload script z contextIsolation
       nodeIntegration: true,
       contextIsolation: false,
       enableRemoteModule: true,
     },
   });
-  mainWindow.setMenu(null); // usuwa domyślne menu systemowe
+
+  mainWindow.setMenu(null);
   mainWindow.loadFile(path.join(__dirname, 'app', 'index.html'));
-  
+
   ipcMain.on('window-minimize', () => {
     mainWindow.minimize();
-});
+  });
 
-ipcMain.on('window-close', () => {
+  ipcMain.on('window-close', () => {
     mainWindow.close();
-});
+  });
 }
 
 app.whenReady().then(createWindow);
@@ -46,100 +48,125 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) createWindow();
 });
 
-// Funkcja pomocnicza do porównania wersji (tylko numeryczne części)
+// Funkcja pomocnicza do porównania wersji
 function isRemoteVersionNewer(localRaw, remoteRaw) {
-  // Rozdzielamy ciągi według dwukropka: "wersja:release"
   const [localVersion, localRelease] = localRaw.split(':');
   const [remoteVersion, remoteRelease] = remoteRaw.split(':');
-  
-  // Porównanie numeryczne wersji
+
   const localParts = localVersion.split('.').map(n => parseInt(n));
   const remoteParts = remoteVersion.split('.').map(n => parseInt(n));
-  
+
   for (let i = 0; i < Math.max(localParts.length, remoteParts.length); i++) {
     const lNum = localParts[i] || 0;
     const rNum = remoteParts[i] || 0;
     if (rNum > lNum) return true;
     if (rNum < lNum) return false;
   }
-  
-  // Jeśli numeryczne części są równe, można opcjonalnie porównać release (tutaj przyjmujemy, że jeśli release są różne, aktualizacja też ma sens)
+  // Jeśli numeryczne części są równe, porównujemy część "release"
   return remoteRelease !== localRelease;
 }
 
-// IPC – Sprawdzanie wersji
-ipcMain.handle('check-version', async (event) => {
+// IPC – Sprawdzanie wersji aplikacji
+ipcMain.handle('check-version', async () => {
   try {
-    // Ustalenie ścieżki do folderu instalacyjnego (np. AppData/kcdmod)
+    // Ustalenie ścieżki do folderu instalacyjnego
     const appData = process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming');
     const installDir = path.join(appData, 'kcdmod');
-    
-    // Jeśli folder nie istnieje, utwórz go
+
     if (!fs.existsSync(installDir)) {
       fs.mkdirSync(installDir, { recursive: true });
     }
-    
+
     const localVersionPath = path.join(installDir, '.version');
-    
-    // Jeśli plik .version nie istnieje – utwórz go z domyślną wartością "0.0.0:alpha"
+
+    // Jeśli plik .version nie istnieje, utwórz go z domyślną wartością
     if (!fs.existsSync(localVersionPath)) {
       fs.writeFileSync(localVersionPath, "0.0.0:alpha");
     }
-    
-    // Odczyt lokalnej wersji
+
     const localRaw = fs.readFileSync(localVersionPath, 'utf8').trim();
-    const [localVersion, localRelease] = localRaw.split(':');
-    
-    // Pobierz zdalny plik .version
-    const versionUrl = 'https://github.com/KCDMOD/Versions/raw/refs/heads/main/.version';
-    const remoteResponse = await axios.get(versionUrl);
-    const remoteRaw = remoteResponse.data.trim(); // np. "0.0.1:alpha"
-    const [remoteVersion, remoteRelease] = remoteRaw.split(':');
-    
-    // Porównaj wersje – jeśli zdalna jest nowsza, ustaw flagę updateNeeded
+
+    // Pobieranie pliku .version z prywatnego repozytorium organizacji przy użyciu GitHub API
+    const token = process.env.GITHUB_TOKEN;
+    const organization = process.env.GITHUB_ORG;
+    const repository = process.env.GITHUB_REPO;
+
+    if (!token || !organization || !repository) {
+      throw new Error('Error with token at .env');
+    }
+
+    const versionUrl = `https://api.github.com/repos/${organization}/${repository}/contents/.version?ref=main`;
+
+    const remoteResponse = await axios.get(versionUrl, {
+      headers: {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3.raw'
+      }
+    });
+
+    let remoteRaw;
+    if (remoteResponse.data.content) {
+      remoteRaw = Buffer.from(remoteResponse.data.content, 'base64').toString('utf8').trim();
+    } else {
+      remoteRaw = remoteResponse.data.trim();
+    }
+
     const updateNeeded = isRemoteVersionNewer(localRaw, remoteRaw);
-    
-    // Jeśli aktualizacja jest potrzebna, zapisz nową wersję do lokalnego pliku
+
+    // Jeśli aktualizacja jest potrzebna, zapisz nową wersję do pliku lokalnego
     if (updateNeeded) {
       fs.writeFileSync(localVersionPath, remoteRaw);
     }
-    
-    return { version: remoteVersion, release: remoteRelease, updateNeeded };
+
+    return { version: remoteRaw.split(':')[0], release: remoteRaw.split(':')[1], updateNeeded };
   } catch (error) {
-    console.error('Error with checking version..', error);
+    console.error('Error with version checking', error);
     throw error;
   }
 });
 
-// IPC – Rozpoczęcie aktualizacji (pobiera paczkę, rozpakowuje, tworzy skrót)
-ipcMain.handle('start-update', async (event) => {
+// IPC – Rozpoczęcie aktualizacji (pobieranie paczki ZIP, rozpakowywanie, tworzenie skrótu)
+ipcMain.handle('start-update', async () => {
   try {
-    // Ścieżka tymczasowa do zapisania pliku .zip
+    const token = process.env.GITHUB_TOKEN;
+    const organization = process.env.GITHUB_ORG;
+    const repository = process.env.GITHUB_REPO;
+
+    if (!token || !organization || !repository) {
+      throw new Error('Problem with .env');
+    }
+
+    // Pobieranie pliku ZIP z repozytorium
+    const zipUrl = `https://api.github.com/repos/${organization}/${repository}/contents/kcdmod.zip?ref=main`;
     const tmpZipPath = path.join(os.tmpdir(), 'kcdmod.zip');
-    const zipUrl = 'https://github.com/KCDMOD/Versions/raw/refs/heads/main/kcdmod.zip';
-    
-    // Pobierz archiwum .zip
-    const response = await axios({ url: zipUrl, method: 'GET', responseType: 'stream' });
+
+    const zipResponse = await axios.get(zipUrl, {
+      headers: {
+        'Authorization': `token ${token}`,
+        'Accept': 'application/vnd.github.v3.raw'
+      },
+      responseType: 'stream'
+    });
+
     const writer = fs.createWriteStream(tmpZipPath);
-    response.data.pipe(writer);
-    
+    zipResponse.data.pipe(writer);
+
     await new Promise((resolve, reject) => {
       writer.on('finish', resolve);
       writer.on('error', reject);
     });
-    
-    // Ścieżka instalacyjna
+
     const appData = process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming');
     const installDir = path.join(appData, 'kcdmod');
-    
+
     if (!fs.existsSync(installDir)) {
       fs.mkdirSync(installDir, { recursive: true });
     }
-    
-    // Rozpakuj archiwum do folderu instalacyjnego
+
+    // Rozpakowywanie pobranego archiwum ZIP
     await extract(tmpZipPath, { dir: installDir });
-    
-    // Utwórz skrót na pulpicie (używamy biblioteki create-desktop-shortcuts)
+
+    // Tworzenie skrótu na pulpicie
     createDesktopShortcut({
       onlyCurrentOS: true,
       windows: {
@@ -158,7 +185,7 @@ ipcMain.handle('start-update', async (event) => {
         execAsAdministrator: true
       },
     });
-    
+
     return { success: true };
   } catch (error) {
     console.error('Błąd aktualizacji:', error);
@@ -166,21 +193,21 @@ ipcMain.handle('start-update', async (event) => {
   }
 });
 
-// IPC – Uruchomienie aplikacji
-ipcMain.handle('run-app', async (event) => {
+// IPC – Uruchamianie aplikacji (pliku EXE)
+ipcMain.handle('run-app', async () => {
   try {
     const appData = process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming');
     const installDir = path.join(appData, 'kcdmod');
     const exePath = path.join(installDir, 'KCDMOD.exe');
-    
+
     execFile(exePath, (err) => {
       if (err) {
-        console.error('Launch error:', err);
+        console.error('Error with running application:', err);
       }
     });
     return { success: true };
   } catch (error) {
-    console.error('Error with launching application:', error);
+    console.error('Error with running application:', error);
     throw error;
   }
 });
